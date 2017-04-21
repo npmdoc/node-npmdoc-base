@@ -1,0 +1,293 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/node-base/base"
+
+    >base (v0.13.0)</a>
+</h1>
+<h4>Framework for rapidly creating high quality node.js applications, using plugins like building blocks</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.base">module base</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.base.base">
+            function <span class="apidocSignatureSpan"></span>base
+            <span class="apidocSignatureSpan">(config, options)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.base.namespace">
+            function <span class="apidocSignatureSpan">base.</span>namespace
+            <span class="apidocSignatureSpan">(name)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.base" id="apidoc.module.base">module base</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.base.base" id="apidoc.element.base.base">
+        function <span class="apidocSignatureSpan"></span>base
+        <span class="apidocSignatureSpan">(config, options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Base(config, options) {
+  if (!(this instanceof Base)) {
+    return new Base(config, options);
+  }
+  Cache.call(this, config);
+  this.is(&#x27;base&#x27;);
+  this.initBase(config, options);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.base.namespace" id="apidoc.element.base.namespace">
+        function <span class="apidocSignatureSpan">base.</span>namespace
+        <span class="apidocSignatureSpan">(name)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function namespace(name) {
+  var Cache = name ? CacheBase.namespace(name) : CacheBase;
+  var fns = [];
+
+<span class="apidocCodeCommentSpan">  /**
+   * Create an instance of `Base` with the given `config` and `options`.
+   *
+   * ```js
+   * // initialize with `config` and `options`
+   * var app = new Base({isApp: true}, {abc: true});
+   * app.set(&#x27;foo&#x27;, &#x27;bar&#x27;);
+   *
+   * // values defined with the given `config` object will be on the root of the instance
+   * console.log(app.baz); //=&#x3e; undefined
+   * console.log(app.foo); //=&#x3e; &#x27;bar&#x27;
+   * // or use `.get`
+   * console.log(app.get(&#x27;isApp&#x27;)); //=&#x3e; true
+   * console.log(app.get(&#x27;foo&#x27;)); //=&#x3e; &#x27;bar&#x27;
+   *
+   * // values defined with the given `options` object will be on `app.options
+   * console.log(app.options.abc); //=&#x3e; true
+   * ```
+   *
+   * @param {Object} `config` If supplied, this object is passed to [cache-base][] to merge onto the the instance upon instantiation
+.
+   * @param {Object} `options` If supplied, this object is used to initialize the `base.options` object.
+   * @api public
+   */
+</span>
+  function Base(config, options) {
+    if (!(this instanceof Base)) {
+      return new Base(config, options);
+    }
+    Cache.call(this, config);
+    this.is(&#x27;base&#x27;);
+    this.initBase(config, options);
+  }
+
+  /**
+   * Inherit cache-base
+   */
+
+  util.inherits(Base, Cache);
+
+  /**
+   * Add static emitter methods
+   */
+
+  for (var key in Emitter.prototype) {
+    define(Base, key, Emitter.prototype[key]);
+  }
+
+  /**
+   * Initialize `Base` defaults with the given `config` object
+   */
+
+  Base.prototype.initBase = function(config, options) {
+    this.options = merge({}, this.options, options);
+    this.cache = this.cache || {};
+    this.define(&#x27;registered&#x27;, {});
+    if (name) this[name] = {};
+
+    // make `app._callbacks` non-enumerable
+    this.define(&#x27;_callbacks&#x27;, this._callbacks);
+    if (isObject(config)) {
+      this.visit(&#x27;set&#x27;, config);
+    }
+    Base.run(this, &#x27;use&#x27;, fns);
+  };
+
+  /**
+   * Set the given `name` on `app._name` and `app.is*` properties. Used for doing
+   * lookups in plugins.
+   *
+   * ```js
+   * app.is(&#x27;foo&#x27;);
+   * console.log(app._name);
+   * //=&#x3e; &#x27;foo&#x27;
+   * console.log(app.isFoo);
+   * //=&#x3e; true
+   * app.is(&#x27;bar&#x27;);
+   * console.log(app.isFoo);
+   * //=&#x3e; true
+   * console.log(app.isBar);
+   * //=&#x3e; true
+   * console.log(app._name);
+   * //=&#x3e; &#x27;bar&#x27;
+   * ```
+   * @name .is
+   * @param {String} `name`
+   * @return {Boolean}
+   * @api public
+   */
+
+  Base.prototype.is = function(name) {
+    if (typeof name !== &#x27;string&#x27;) {
+      throw new TypeError(&#x27;expected name to be a string&#x27;);
+    }
+
+    this.define(&#x27;type&#x27;, name);
+    this.define(&#x27;is&#x27; + pascal(name), true);
+
+    // the following properties are deprecated and will
+    // be removed in a future release
+    this.define(&#x27;_name&#x27;, name);
+    this.define(&#x27;_appname&#x27;, name);
+    return this;
+  };
+
+  /**
+   * Returns true if a plugin has already been registered on an instance.
+   *
+   * Plugin implementors are encouraged to use this first thing in a plugin
+   * to prevent the plugin from being called more than once on the same
+   * instance.
+   *
+   * ```js
+   * var base = new Base();
+   * base.use(function(app) {
+   *   if (app.isRegistered(&#x27;myPlugin&#x27;)) return;
+   *   // do stuff to `app`
+   * });
+   *
+   * // to also record the plugin as being registered
+   * base.use(function(app) {
+   *   if (app.isRegistered(&#x27;myPlugin&#x27;, true)) return;
+   *   // do stuff to `app`
+   * });
+   * ```
+   * @name .isRegistered
+   * @emits `plugin` Emits the name of the plugin being registered. Useful for unit tests, to ensure plugins are only registered
+ once.
+   * @param {String} `name` The plugin name.
+   * @param {Boolean} `register` If the plugin if not already registered, to record it as being registered pass `true` as the second
+ argument.
+   * @return {Boolean} Returns true if a plugin is already registered.
+   * @api public
+   */
+
+  Base.prototype.isRegistered = function(name, register) {
+    if (this.registered.hasOwnProperty(name)) {
+      return true;
+    }
+    if (register !== false) {
+      this.registered[name] = true;
+      this.emit(&#x27;plugin&#x27;, name);
+    }
+    ret ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+**Inherit or instantiate with a namespace**
+
+By default, the `.get`, `.set` and `.has` methods set and get values from the root of the `base` instance. You can customize this
+ using the `.namespace` method exposed on the exported function. For example:
+
+```js
+var Base = require(&#x27;base&#x27;);
+// get and set values on the `base.cache` object
+var base = Base.<span class="apidocCodeKeywordSpan">namespace</span>(&#x27;cache&#x27;);
+
+var app = base();
+app.set(&#x27;foo&#x27;, &#x27;bar&#x27;);
+console.log(app.cache.foo);
+//=&#x3e; &#x27;bar&#x27;
+```
+&#x3c;/details&#x3e;
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
